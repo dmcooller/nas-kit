@@ -1,7 +1,5 @@
 import logging
 from . import epdconfig
-# import epdconfig
-import numpy as np
 import time
 # Display resolution
 EPD_WIDTH       = 122
@@ -100,8 +98,8 @@ class EPD:
         
     def ReadBusy(self):
         while(epdconfig.digital_read(self.busy_pin) == 1):      # 0: idle, 1: busy
-            pass
-            # epdconfig.delay_ms(100)    
+            #pass
+            epdconfig.delay_ms(100)    
 
     def TurnOnDisplay(self):
         self.send_command(0x22)
@@ -178,10 +176,8 @@ class EPD:
             self.send_data(0x00)
             self.ReadBusy()
         else:
-
             # self.send_command(0x2C)     #VCOM Voltage
             # self.send_data(0x26)
-
             self.ReadBusy()
 
             self.send_command(0x32)
