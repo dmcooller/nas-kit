@@ -26,6 +26,24 @@ git clone --depth=1 https://github.com/dmcooller/nas-kit.git
 cd nas-kit
 python3 setup.py
 ```
+## Manual control
+
+You can manually start/storp/restart the service with the following commands.
+
+Start:
+``` bash
+sudo systemctl start nas-kit
+```
+
+Stop:
+``` bash
+sudo systemctl stop nas-kit
+```
+
+Restart:
+``` bash
+sudo systemctl restart nas-kit
+```
 
 ## Install OMV 6
 
