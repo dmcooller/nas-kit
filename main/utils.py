@@ -154,6 +154,23 @@ def pi_read():
     }
     return result 
 
+def top_process(n: int)->list:
+    """
+    Get top 3 process with highest CPU usage
+
+    Return example:
+    [
+        ['python3', '1.0', '22.5'],
+        ['systemd', '0.1', '10.5']
+    ]
+    """
+    top = os.popen("ps -eo comm,%cpu,rss --sort=-%cpu | awk 'NR==1 {print $1, $2, \"RSS(MB)\"} NR>1 {printf \"%s %s %.1f\\n\", $1, $2, $3/1024}' | head -n "+str(n+1)).read()
+    # extract service name, CPU%, MEM% to list
+    result = top.split('\n')[1:-1]
+    result = list(map(lambda x: x.split(), result))
+    return result
+
+
 # def fan_control(temp = 0):
 #     if temp >=68:
 #         fan_duty_cycle = round(float(temp-67)*30,1)

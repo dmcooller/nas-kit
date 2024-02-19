@@ -203,6 +203,26 @@ class Page():
                 self.draw.rectangle((2, 72 + i*29, 234, 82 + i*29), outline = 255-self.background_color)
                 self.draw.rectangle((3, 72 + i*29, 234 * float(hard_disk_list[i][4].replace('%', ''))/100, 82 + i*29), fill = 255-self.background_color)
 
+
+    def page_4_setup(self):
+        pass
+    
+    def page_4_update(self):
+        """TOP 5 PROCESSES"""
+        top = top_process(5)
+        self.draw.rectangle((0, 26, 250, 250), fill = self.background_color)
+        self.draw.text((60, 0), "TOP 5 PROCESSES", font = font(18), fill = 255-self.background_color)
+        self.draw.line([(0,25),(250,25)], fill = 255-self.background_color,width = 2)
+
+        self.draw.text((6, 26), "Name", font = font(14), fill = 255-self.background_color)
+        self.draw.text((150, 26), "CPU", font = font(14), fill = 255-self.background_color)
+        self.draw.text((190, 26), "MEM(MB)", font = font(14), fill = 255-self.background_color)
+        for i in range(5):
+            self.draw.text((6, 40 + 14 * i), top[i][0][:17], font = font(14), fill = 255-self.background_color)
+            self.draw.text((150, 40 + 14 * i), top[i][1], font = font(14), fill = 255-self.background_color)
+            self.draw.text((190, 40 + 14 * i), top[i][2], font = font(14), fill = 255-self.background_color)            
+
+
     def shutdown_Animation(self):
         # self.image = Image.new('1', (epd.height, epd.width), self.background_color)
         # self.draw = ImageDraw.Draw(self.image)

@@ -20,7 +20,7 @@ background_color_config = 255
 
 #page_mode and flag
 page_mode_val = 0
-page_quantity = 3
+page_quantity = 4
 
 #button_val
 current_page = 1
