@@ -53,7 +53,7 @@ class RaspberryPi:
         self.GPIO.output(pin, value)
 
     def digital_read(self, pin):
-        return self.GPIO.input(self.BUSY_PIN)
+        return self.GPIO.input(pin)
 
     def delay_ms(self, delaytime):
         time.sleep(delaytime / 1000.0)
@@ -113,7 +113,7 @@ class JetsonNano:
         self.GPIO.output(pin, value)
 
     def digital_read(self, pin):
-        return self.GPIO.input(self.BUSY_PIN)
+        return self.GPIO.input(pin)
 
     def delay_ms(self, delaytime):
         time.sleep(delaytime / 1000.0)
@@ -142,7 +142,7 @@ class JetsonNano:
         self.GPIO.cleanup()
 
 
-if os.path.exists('/sys/bus/platform/drivers/gpiomem-bcm2835'):
+if os.path.exists("/sys/bus/platform/drivers/gpiomem-bcm2835") or os.path.exists("/sys/bus/platform/drivers/rpi-gpiomem"):
     implementation = RaspberryPi()
 else:
     implementation = JetsonNano()
