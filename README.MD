@@ -16,27 +16,15 @@ sudo apt update
 Install dependencies
 
 ``` bash
-sudo apt install git python3 python3-pip -y
-```
-
-Enable SPI
-
-``` bash
-sudo raspi-config nonint do_spi 0
+sudo apt install git python3.11 -y
 ```
 
 Install nas kit
     
 ``` bash
-git clone --depth=1 https://github.com/sunfounder/nas-kit.git
+git clone --depth=1 https://github.com/dmcooller/nas-kit.git
 cd nas-kit
-sudo python3 setup.py
-sudo cp ./bin/nas-kit.service /lib/systemd/system/nas-kit.service
-sudo cp ./bin/nas-kit /usr/bin/nas-kit
-sudo chmod +x /usr/bin/nas-kit
-sudo systemctl daemon-reload
-sudo systemctl enable nas-kit.service
-sudo systemctl start nas-kit
+python3 setup.py
 ```
 
 ## Install OMV 6

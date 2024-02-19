@@ -3,11 +3,11 @@
 case "$1" in
     start)
         echo "Starting NAS Kit"
-        sudo python3 /home/pi/nas-kit/main/raspi_omv_main.py &
+        sudo {base_path}/venv/bin/python3 {base_path}/main/raspi_omv_main.py &
         ;;
     stop)
         echo "Stopping NAS Kit"
-        kill $(ps aux | grep -m 1 'python3 /home/pi/nas-kit/main/raspi_omv_main.py' | awk '{ print $2 }')
+        kill $(ps aux | grep -m 1 '{base_path}/venv/bin/python3 {base_path}/main/raspi_omv_main.py' | awk '{ print $2 }')
         raspi-gpio set 18 dl
         ;;
     restart)
