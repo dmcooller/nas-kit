@@ -11,9 +11,9 @@ from utils import *
 from page import *
 import threading
 
-run_command("sudo resize2fs /dev/mmcblk0p2")
+#run_command("sudo resize2fs /dev/mmcblk0p2")
 #Menu_page_protect 
-# Menu_page_protect_flag = 0 
+# Menu_page_protect_flag = 0
 
 #background_color
 background_color_config = 255
@@ -39,9 +39,9 @@ KEY_SUB = 19
 #GPIO_Irq_Init
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(KEY_BACK,GPIO.IN,GPIO.PUD_UP)
-GPIO.setup(KEY_OK,GPIO.IN,GPIO.PUD_UP) 
+GPIO.setup(KEY_OK,GPIO.IN,GPIO.PUD_UP)
 GPIO.setup(KEY_ADD,GPIO.IN,GPIO.PUD_UP)
-GPIO.setup(KEY_SUB,GPIO.IN,GPIO.PUD_UP) 
+GPIO.setup(KEY_SUB,GPIO.IN,GPIO.PUD_UP)
 
 page = Page(background_color_config)
 page.timer = 1
@@ -62,7 +62,6 @@ def KEY_ADD_FUNC(KEY_ADD):
             current_page += 1
         else:
             current_page = 1
-        
 
     if button_press_protect == 0:
         page.change_val(0)
@@ -81,7 +80,7 @@ def KEY_ADD_FUNC(KEY_ADD):
 
 def KEY_SUB_FUNC(KEY_SUB): 
     global current_page,button_press_protect,menu_button_val,Menu_item_len,page_mode_val,page_quantity
-    
+
     if button_press_protect == 1 and page_mode_val == 1:
         page.change_val(0)
         if current_page > 1:
@@ -106,7 +105,7 @@ def KEY_SUB_FUNC(KEY_SUB):
 
 def KEY_BACK_FUNC(KEY_BACK):
     global back_button_press_val,button_press_protect,page_mode_val,page_quantity
-    
+
     # if button_press_protect == 1 and page_mode_val == 1:
     if page_mode_val == 1:
         page.change_val(0)
@@ -151,19 +150,19 @@ class Menu_item_templates():
         self.item_name_length = len(item_name)
         # self.background_color_config = 255
         # self.page_mode_val = 0
-    
+
     def linux_cmd(self,input_cmd_1 = ":",input_cmd_2 = ":"):
         # do(msg=input_msg,cmd='run_command("intput_cmd")') 
         self.linux_cmd_1 = input_cmd_1
         self.linux_cmd_2 = input_cmd_2
-    
+
     def python_cmd(self,input_cmd_1 = 'None',input_cmd_2 = 'None'):
         self.python_cmd_1 = input_cmd_1
         self.python_cmd_2 = input_cmd_2
-    
+
     def run_linux_cmd(self,linux_cmd):
         run_command(linux_cmd)
-    
+
     def run_python_cmd(self,python_cmd):
         global page_mode_val,background_color_config
         exec(python_cmd)
@@ -176,7 +175,7 @@ class Menu_item_templates():
             if self.his_button_val != menu_button_val:
                 self.choice_button_flag *= -1
                 self.his_button_val = menu_button_val
-            
+
             menu_draw.rectangle((40, 100, 100, 120), fill = 128 - self.choice_button_flag * self.choice_button_color)
             menu_draw.rectangle((160, 100, 220, 120), fill = 128 + self.choice_button_flag * self.choice_button_color)
             menu_draw.text((48, 100), self.choice_button_one, font = font(18), fill = 128 + self.choice_button_flag * self.choice_button_color)
@@ -245,10 +244,10 @@ item_4.python_cmd(item_4_cmd_1,item_4_cmd_2)
 
 ###Menu_dict and length
 Menu_item_dict = {1:item_1.item_name, 2:item_2.item_name, 3:item_3.item_name, 4:item_4.item_name}
-Menu_item_len = len(Menu_item_dict) 
+Menu_item_len = len(Menu_item_dict)
 
 #GPIO_IRQ_RELATION
-GPIO.add_event_detect(KEY_BACK,GPIO.RISING,KEY_BACK_FUNC,200) 
+GPIO.add_event_detect(KEY_BACK,GPIO.RISING,KEY_BACK_FUNC,200)
 GPIO.add_event_detect(KEY_OK,GPIO.RISING,KEY_OK_FUNC,200)
 GPIO.add_event_detect(KEY_ADD,GPIO.RISING,KEY_ADD_FUNC,200)
 GPIO.add_event_detect(KEY_SUB,GPIO.RISING,KEY_SUB_FUNC,200)
@@ -257,7 +256,7 @@ GPIO.add_event_detect(KEY_SUB,GPIO.RISING,KEY_SUB_FUNC,200)
 def Menu_Page():
     global back_button_press_val,last_page,current_page,ok_button_press_val,\
     menu_button_val,Menu_item_len,Menu_item_dict,background_color_config
-    
+
     epd.init(epd.FULL_UPDATE)
     epd.displayPartBaseImage(epd.getbuffer(menu_image)) 
     epd.init(epd.PART_UPDATE)
@@ -285,10 +284,10 @@ def Menu_Page():
         rectangle_coor_num =  (menu_button_val-1) % 3
         menu_draw.rectangle((0, 2*(rectangle_coor_num+1)*10+10, 245, 2*(rectangle_coor_num+1)*10+30), outline = 0)
         epd.displayPartial(epd.getbuffer(menu_image))
-        
+
         if ok_button_press_val == -1:
-            eval("item_%s.item_main()" % menu_button_val) 
-            
+            eval("item_%s.item_main()" % menu_button_val)
+
             choice_button_flag = -1
             # his_button_val = -3
             menu_button_val = 1
@@ -317,7 +316,7 @@ def main():
             last_page = -3
             # print("quit Menu")
 
-        button_press_protect = 0  
+        button_press_protect = 0
         
 ###main_thread
 def main_thread():
@@ -330,8 +329,8 @@ def main_thread():
     t2.start()
 
 if __name__ =='__main__':
-    try: 
-        main_thread() 
-    except KeyboardInterrupt:      
-        print("quit")    
+    try:
+        main_thread()
+    except KeyboardInterrupt:
+        print("quit")
         exit()
