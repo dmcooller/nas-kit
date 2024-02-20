@@ -1,15 +1,3 @@
-import subprocess
-
-
-def run_command(cmd=""):
-    p = subprocess.Popen(
-        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    result = p.stdout.read().decode('utf-8')
-    status = p.poll()
-    # print(result)
-    # print(status)
-    return status, result
-
 def do(msg="", cmd=""):
     print(" - %s..." % (msg), end='\r')
     print(" - %s... " % (msg), end='')
@@ -19,8 +7,7 @@ def do(msg="", cmd=""):
         print('Done')
         return result
     print('Error')
-    raise OSError("%s command:\n %s error:\n  Status:%s\n  Error:%s" % (cmd, msg, status, result))
-
+    raise OSError("command: %s\n error:%s\n  Status:%s\n  Error:%s" % (cmd, msg, status, result))
 
 def install():
     try:

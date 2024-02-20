@@ -11,6 +11,8 @@ from utils import *
 from page import *
 import threading
 
+logging.basicConfig(level=logging.WARNING)
+
 #run_command("sudo resize2fs /dev/mmcblk0p2")
 #Menu_page_protect 
 # Menu_page_protect_flag = 0
@@ -73,8 +75,8 @@ def KEY_ADD_FUNC(KEY_ADD):
             menu_button_val += 1
         else: 
             menu_button_val = 1
-    # print(current_page)
-    # print(button_press_protect)
+    logging.debug("current_page: %s", current_page)
+    logging.debug("button_press_protect: %s", button_press_protect)
     button_press_protect = 0
 
 
@@ -100,8 +102,8 @@ def KEY_SUB_FUNC(KEY_SUB):
         else:
             menu_button_val = Menu_item_len
     button_press_protect = 0
-    # print(current_page)
-    # print(button_press_protect)
+    logging.debug("current_page: %s", current_page)
+    logging.debug("button_press_protect: %s", button_press_protect)
 
 def KEY_BACK_FUNC(KEY_BACK):
     global back_button_press_val,button_press_protect,page_mode_val,page_quantity
@@ -110,7 +112,7 @@ def KEY_BACK_FUNC(KEY_BACK):
     if page_mode_val == 1:
         page.change_val(0)
         back_button_press_val += 1
-      #  print(back_button_press_val)
+        logging.debug("back_button_press_val: %s", back_button_press_val)
     if back_button_press_val > 2:
         page.change_val(0)
         back_button_press_val = 0
@@ -119,16 +121,16 @@ def KEY_BACK_FUNC(KEY_BACK):
         # page.change_val(0)
         back_button_press_val += 1
 
-    # print("button_press_protect: ",button_press_protect)
-    # print("back_button_press_val: ",back_button_press_val)
+    logging.debug("back_button_press_val: %s", back_button_press_val)
+    logging.debug("button_press_protect: %s", button_press_protect)
 
-def KEY_OK_FUNC(KEY_OK): 
+def KEY_OK_FUNC(KEY_OK):
     global last_page,button_press_protect,ok_button_press_val,page_mode_val,page_quantity
 
-    if button_press_protect == 0: 
-        ok_button_press_val = -1*ok_button_press_val  
+    if button_press_protect == 0:
+        ok_button_press_val = -1*ok_button_press_val
         if page_mode_val == 0:
-            last_page = -1 
+            last_page = -1
 
 #Menu class
 class Menu_item_templates():
@@ -145,14 +147,14 @@ class Menu_item_templates():
         self.choice_button_color = 255
         self.linux_cmd_1 = ":"
         self.linux_cmd_2 = ":"
-        self.python_cmd_1 = 'None' 
+        self.python_cmd_1 = 'None'
         self.python_cmd_2 = 'None'
         self.item_name_length = len(item_name)
         # self.background_color_config = 255
         # self.page_mode_val = 0
 
     def linux_cmd(self,input_cmd_1 = ":",input_cmd_2 = ":"):
-        # do(msg=input_msg,cmd='run_command("intput_cmd")') 
+        # do(msg=input_msg,cmd='run_command("intput_cmd")')
         self.linux_cmd_1 = input_cmd_1
         self.linux_cmd_2 = input_cmd_2
 
@@ -191,7 +193,7 @@ class Menu_item_templates():
                     self.run_python_cmd(self.python_cmd_1)
                     self.run_linux_cmd(self.linux_cmd_1)
                 menu_draw.rectangle((0, 90, 250, 120), fill = 255)
-                epd.displayPartial(epd.getbuffer(menu_image)) 
+                epd.displayPartial(epd.getbuffer(menu_image))
                 back_button_press_val = 0
                 break
 
@@ -286,15 +288,15 @@ def Menu_Page():
         epd.displayPartial(epd.getbuffer(menu_image))
 
         if ok_button_press_val == -1:
-            eval("item_%s.item_main()" % menu_button_val)
+            eval("item_%s.item_main()", menu_button_val)
 
             choice_button_flag = -1
             # his_button_val = -3
             menu_button_val = 1
-            current_page = 1 
+            current_page = 1
 
         if back_button_press_val > 0:
-            back_button_press_val = 0 
+            back_button_press_val = 0
             break
 
 ###Main Service
@@ -304,17 +306,17 @@ def main():
     while True:  
         page.background_color = background_color_config
         if current_page != last_page:
-            # print("main_page")
+            logging.debug("main_page")
             button_press_protect = 1
             last_page = current_page
             page.mode = page_mode_val
             page(current_page)
         elif back_button_press_val >= 2:
-            # print("menu_page")
+            logging.debug("menu_page")
             Menu_Page()
             current_page = 1
             last_page = -3
-            # print("quit Menu")
+            logging.debug("quit_menu")
 
         button_press_protect = 0
         
@@ -332,5 +334,5 @@ if __name__ =='__main__':
     try:
         main_thread()
     except KeyboardInterrupt:
-        print("quit")
+        logging.debug("quit")
         exit()

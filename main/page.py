@@ -7,7 +7,7 @@ from PIL import Image,ImageDraw,ImageFont
 import traceback
 from utils import *
 
-
+logger = logging.getLogger(__name__)
 
 fontdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'font')
 libdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'lib')
@@ -43,7 +43,7 @@ class Page():
         epd.init(epd.PART_UPDATE)
     
     def clear(self):
-        # print("clear!")
+        logging.debug("Run clear")
         self.clear_count = 0
         epd.Clear(self.background_color)
         # epd.init(epd.PART_UPDATE)
@@ -72,7 +72,7 @@ class Page():
         while self.page_change_flag:
             t = time.time()
             cmd = "self.page_%s_update()"%p
-            # print(cmd)
+            logging.debug(cmd)
             eval(cmd)
             # if self.clear_count > self.clear_max:
             #     print("begin")
@@ -110,13 +110,13 @@ class Page():
         self.draw.rectangle((0, 75, 234, 85), outline = 255-self.background_color)
         self.draw.rectangle((0, 75, 234 * float(pi_msg['cpu_usage'])/100, 85), fill = 255-self.background_color)
 
-        Ram_usage = round(pi_msg['ram'][1] / pi_msg['ram'][0],2)
+        ram_usage = round(pi_msg['ram'][1] / pi_msg['ram'][0],2)
         self.draw.rectangle((37, 88, 105, 108), fill = self.background_color)
         self.draw.rectangle((175, 88, 235, 108), fill = self.background_color)
-        self.draw.text((0, 88), 'RAM: ' + str(Ram_usage) + '%', font = font(16), fill = 255-self.background_color)
+        self.draw.text((0, 88), 'RAM: ' + str(ram_usage) + '%', font = font(16), fill = 255-self.background_color)
         self.draw.text((120, 88), 'total: ' + str(pi_msg['ram'][0]) + 'M', font = font(16), fill = 255-self.background_color)
         self.draw.rectangle((0, 110, 234, 120), outline = 255-self.background_color)
-        self.draw.rectangle((0, 110, 234 * Ram_usage/100, 120), fill = 255-self.background_color) 
+        self.draw.rectangle((0, 110, 234 * ram_usage/100, 120), fill = 255-self.background_color) 
     
 
     def page_2_setup(self):

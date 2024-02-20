@@ -291,7 +291,7 @@ class EPD:
         self.send_command(0x24)
         for j in range(0, self.height):
             for i in range(0, linewidth):
-                self.send_data(color)   
+                self.send_data(color)
         self.TurnOnDisplay()
 
     def sleep(self):

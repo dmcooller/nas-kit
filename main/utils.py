@@ -1,8 +1,10 @@
+import logging
 import subprocess
 import os
 import RPi.GPIO as GPIO
 import time
 
+logger = logging.getLogger(__name__)
 
 FAN_PWM = 18
 LED_PWM = 26
@@ -13,7 +15,7 @@ FAN_MAX = 100
 FAN_MIN = 20
 fan_power = 0
 
-GPIO.setwarnings(False) 
+GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 output_list = [FAN_PWM,LED_PWM]
 GPIO.setup(output_list, GPIO.OUT)
@@ -50,7 +52,7 @@ class PID():
     def run(self, value, mode="PID"):
         self.last_error = self.error
         self.error = value - self.expect
-        # print(self.error, self.last_error, self.pval, self.P)
+        logging.debug("Error: %s, Last Error: %s, Pval: %s, P: %s", self.error, self.last_error, self.pval, self.P)
         result_p = self.P * self.pval
         result_i = self.I * self.ival
         result_d = self.D * self.dval
@@ -66,26 +68,12 @@ class PID():
 
 #run_command linux
 def run_command(cmd=""):
-    import subprocess
     p = subprocess.Popen(
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     result = p.stdout.read().decode('utf-8')
     status = p.poll()
-    # print(result)
-    # print(status)
+    logging.debug("Command: %s\nStatus: %s\nResult: %s", cmd, status, result)
     return status, result
-
-def do(msg="", cmd=""):
-    print(" - %s..." % (msg), end='\r')
-    print(" - %s... " % (msg), end='')
-    status, result = eval(cmd)
-    # print(status, result)
-    if status == 0 or status == None or result == "":
-        print('Done')
-    else:
-        print('Error')
-        errors.append("%s error:\n  Status:%s\n  Error:%s" %
-                      (msg, status, result))
 
 def cpu_temperature():          # cpu_temperature
     raw_cpu_temperature = subprocess.getoutput("cat /sys/class/thermal/thermal_zone0/temp") 
@@ -105,7 +93,7 @@ def cpu_usage():                # cpu_usage
     result = result.split('\n')[-1].split(' ')[-1]
     result = round(100 - float(result), 2)
     result = str(result)
-    # print(result)
+    logging.debug("CPU Usage: %s", result)
     return result
 
 def disk_space():               # disk_space
@@ -115,11 +103,11 @@ def disk_space():               # disk_space
         i = i +1
         line = p.readline()         
         if i==2:
-            return line.split()[1:5] 
+            return line.split()[1:5]
 
 def portable_hard_disk_info():
     disk_num = os.popen("df -h | grep '/dev/sd' -c")
-    phd = os.popen("df -h | grep '/dev/sd'") 
+    phd = os.popen("df -h | grep '/dev/sd'")
     i = 0
     phd_line = disk_num.readline()
 
@@ -128,7 +116,7 @@ def portable_hard_disk_info():
         while 1:
             i = i +1
             line = phd.readline()
-            line_list.append(line.split()[0:6])        
+            line_list.append(line.split()[0:6])
             if i==int(phd_line):
                 return line_list
     else:
@@ -141,7 +129,7 @@ def ram_info():
         i = i + 1
         line = p.readline()
         if i==2:
-            return list(map(lambda x:round(int(x) / 1000,1), line.split()[1:4]))   
+            return list(map(lambda x:round(int(x) / 1000,1), line.split()[1:4]))
 
 def pi_read():
     result = {
@@ -150,9 +138,9 @@ def pi_read():
         "cpu_usage": cpu_usage(), 
         "disk": disk_space(), 
         "ram": ram_info(), 
-        # "battery": power_read(), 
+        # "battery": power_read(),
     }
-    return result 
+    return result
 
 def top_process(n: int)->list:
     """
@@ -214,19 +202,15 @@ def pid_control():
         expect = 50,
     )
     dc = 100
-    i = 0
     while True:
-        temp = (float(cpu_temperature())+float(gpu_temperature()))/2.0 
-        # print(temp)
+        temp = (float(cpu_temperature())+float(gpu_temperature()))/2.0
         dc += pid.run(temp, mode="PD")
         dc = min(FAN_MAX, max(FAN_MIN, dc))
         fan_power = dc
-        # log_temp(i, temp, dc)
-        # print(dc )
+        logging.debug("Temp: %s, DC: %s", temp, dc)
         fan_pwm_pin.ChangeDutyCycle(dc)
         led_pwm_pin.ChangeDutyCycle(dc)
-        i += 1
         # time.sleep(1)
 
 # if __name__ == '__main__':
-#     print(portable_hard_disk_info())
+#     logging.debug("Portale Hard Disk Info: %s", portable_hard_disk_info())
