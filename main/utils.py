@@ -217,7 +217,7 @@ def pid_control():
         logging.debug("Temp: %s, DC: %s", temp, dc)
         fan_pwm_pin.ChangeDutyCycle(dc)
         led_pwm_pin.ChangeDutyCycle(dc)
-        # time.sleep(1)
+        time.sleep(1)
 
 # if __name__ == '__main__':
 #     logging.debug("Portale Hard Disk Info: %s", portable_hard_disk_info())

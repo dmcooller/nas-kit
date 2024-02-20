@@ -1,15 +1,12 @@
 #!/usr/bin/ python3
 # -*- coding:utf-8 -*-
 import RPi.GPIO as GPIO
-import sys
-import os
 import logging
 import time
-from PIL import Image,ImageDraw,ImageFont 
-import traceback
+from PIL import Image,ImageDraw
 from utils import *
 from page import *
-import threading
+from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -303,7 +300,7 @@ def Menu_Page():
 def main():
     global current_page,last_page,button_press_protect,background_color_config,page_mode_val
 
-    while True:  
+    while True:
         page.background_color = background_color_config
         if current_page != last_page:
             logging.debug("main_page")
@@ -319,16 +316,14 @@ def main():
             logging.debug("quit_menu")
 
         button_press_protect = 0
+        time.sleep(0.3)
         
 ###main_thread
 def main_thread():
-    threads = []
-    t1 = threading.Thread(target=main)
-    threads.append(t1)
-    t2 = threading.Thread(target=pid_control)
-    threads.append(t2)
-    t1.start()
-    t2.start()
+    # Using ThreadPoolExecutor to manage threads
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        executor.submit(main)
+        executor.submit(pid_control)
 
 if __name__ =='__main__':
     try:
