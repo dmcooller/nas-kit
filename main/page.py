@@ -28,6 +28,12 @@ font = lambda x: ImageFont.truetype(os.path.join(fontdir, 'consola.ttf'), x)
 
 #Page class
 class Page():
+    """
+    Page 1: Basic Info
+    Page 2: Status
+    Page 3: Disk Info
+    Page 4: Top 5 Processes
+    """
     def __init__(self, background_color):
         self.background_color = background_color
         self.mode = 0
@@ -96,6 +102,7 @@ class Page():
         pass
 
     def page_1_update(self):
+        """BASIC INFO"""
         pi_msg = pi_read()
         # fan_control(int((float(cpu_temperature())+float(gpu_temperature()))/2.0))
         
@@ -120,14 +127,15 @@ class Page():
     
 
     def page_2_setup(self):
-        self.draw.text((65, 0), "DETAILED INFO", font = font(18), fill = 255-self.background_color)
+        self.draw.text((65, 0), "STATUS", font = font(18), fill = 255-self.background_color)
         self.draw.line([(0,25),(250,25)], fill = 255-self.background_color,width = 2)
         self.draw.text((9, 48), 'CPU', font = font(18), fill = 255-self.background_color)
         self.draw.text((100, 48), 'GPU', font = font(18), fill = 255-self.background_color)
         self.draw.text((193, 48), 'FAN', font = font(18), fill = 255-self.background_color)
         
     def page_2_update(self):
-        pi_msg = pi_read()
+        """STATUS"""
+        pi_msg = temperature_read()
         # fan_control(int((float(cpu_temperature())+float(gpu_temperature()))/2.0))
         # self.draw.rectangle((0, 80, 250, 100), fill = self.background_color)
 
@@ -167,7 +175,7 @@ class Page():
         # self.draw.text((80, 0), "DISK INFO", font = font(20), fill = 255-self.background_color)
     
     def page_3_update(self):
-        
+        """DISK INFO"""
         def p(a):
             a = float(a)
             if a > 1000000000:
@@ -181,16 +189,16 @@ class Page():
             return a
         hard_disk_list = [] 
         hard_disk_list = portable_hard_disk_info() 
-        pi_msg = pi_read()
+        d_space = disk_space()
         # fan_control(int((float(cpu_temperature())+float(gpu_temperature()))/2.0))  
         
         self.draw.rectangle((0, 26, 250, 250), fill = self.background_color)
         self.draw.text((80, 0), "DISK INFO", font = font(18), fill = 255-self.background_color)
         self.draw.line([(0,25),(250,25)], fill = 255-self.background_color,width = 2)
-        self.draw.text((6, 26), 'root: ' + pi_msg['disk'][3], font = font(14), fill = 255-self.background_color)
-        self.draw.text((102, 26), 'Size: %s / %s' % (pi_msg['disk'][1],pi_msg['disk'][0]), font = font(14), fill = 255-self.background_color)
+        self.draw.text((6, 26), 'root: ' + d_space[3], font = font(14), fill = 255-self.background_color)
+        self.draw.text((102, 26), 'Size: %s / %s' % (d_space[1],d_space[0]), font = font(14), fill = 255-self.background_color)
         self.draw.rectangle((2, 43, 234, 53), outline = 255-self.background_color)
-        self.draw.rectangle((3, 43, 234 * float(pi_msg['disk'][3].replace('%', ''))/100, 53), fill = 255-self.background_color)
+        self.draw.rectangle((3, 43, 234 * float(d_space[3].replace('%', ''))/100, 53), fill = 255-self.background_color)
         if len(hard_disk_list) != 0 and len(hard_disk_list) < 3:
             for i in range(len(hard_disk_list)):
                 self.draw.text((6, 55 + i*29), hard_disk_list[i][0][-4:].upper() +': ' + hard_disk_list[i][4], font = font(14), fill = 255-self.background_color)

@@ -142,6 +142,13 @@ def pi_read():
     }
     return result
 
+def temperature_read():
+    result = {
+        "cpu_temperature": cpu_temperature(), 
+        "gpu_temperature": gpu_temperature(),
+    }
+    return result
+
 def top_process(n: int)->list:
     """
     Get top 3 process with highest CPU usage
