@@ -1,3 +1,5 @@
+from main.utils import run_command
+
 def do(msg="", cmd=""):
     print(" - %s..." % (msg), end='\r')
     print(" - %s... " % (msg), end='')
@@ -69,6 +71,7 @@ def install():
         print(e)
 
     print("Finished")
+    print("\nRun 'sudo systemctl status nas-kit' to check the status of the service")
 
 if __name__ =="__main__":
     install()
