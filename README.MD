@@ -45,7 +45,20 @@ Restart:
 sudo systemctl restart nas-kit
 ```
 
-## Install OMV 6
+## Install OMV 6/7
+
+### Recommendations
+
+I've got some nasty issues when I tried to install OMV, like loose ssh access, and not be able to log in to the web interface. 
+So here are some recommendations that helped me to avoid these issues:
+
+- Don't create user `admin` prior to installing OMV. It will cause a conflict.
+- After installing OMV, you will lickly loose to connect via ssh. You can enable it in the web interface:
+  1. Open `Users -> Users` page.
+  2. Click on your user name.
+  3. Click on `Edit` button.
+  4. In `Groups` tab, check `_ssh` group.
+
 
 Get Raspberry Pi IP address and remember it.
 
@@ -53,17 +66,15 @@ Get Raspberry Pi IP address and remember it.
 hostname -I
 ```
 
-Install OpenMediaVault 6
+Install OpenMediaVault
+
+This script will install OMV 6 for `Bullseye` and OMV 7 for `Bookworm`. 
 
 ``` bash
 wget -O - https://raw.githubusercontent.com/OpenMediaVault-Plugin-Developers/installScript/master/install | sudo bash
 ```
 
-After installation done, Reboot your Raspberry Pi
-
-``` bash
-sudo reboot
-```
+The device will reboot after the installation is complete.
 
 After reboot, you can access OMV web interface with the IP address you got before.
 
@@ -71,7 +82,7 @@ After reboot, you can access OMV web interface with the IP address you got befor
 http://<IP address>
 ```
 
-After the eeb interface loaded, you will be asked to log in to be able to proceed.
+After the web interface loaded, you will be asked to log in to be able to proceed.
 
 The default username is `admin`, and the default password is `openmediavault`.
 
