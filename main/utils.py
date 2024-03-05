@@ -8,8 +8,8 @@ logger = logging.getLogger(__name__)
 
 FAN_PWM = 18
 LED_PWM = 26
-fan_pwn_freq = 100
-led_pwn_freq = 1
+fan_pwm_freq = 100
+led_pwm_freq = 1
 
 FAN_MAX = 100
 FAN_MIN = 20
@@ -20,8 +20,8 @@ GPIO.setmode(GPIO.BCM)
 output_list = [FAN_PWM,LED_PWM]
 GPIO.setup(output_list, GPIO.OUT)
 
-fan_pwm_pin = GPIO.PWM(FAN_PWM, fan_pwn_freq)
-led_pwm_pin = GPIO.PWM(LED_PWM, led_pwn_freq)
+fan_pwm_pin = GPIO.PWM(FAN_PWM, fan_pwm_freq)
+led_pwm_pin = GPIO.PWM(LED_PWM, led_pwm_freq)
 fan_pwm_pin.start(0)
 led_pwm_pin.start(50)
 
@@ -207,22 +207,47 @@ def getIP(ifaces=['wlan0', 'eth0', 'end0']):
 
 def pid_control():
     global fan_power
+    temp_ok = 50
+    # Turn on/off fan if temperature is lower/higher for `n` times counter
+    temp_times_counter_max = 5
+
     pid = PID(
         P = 0.5,
         I = 1,
         D = 1,
-        expect = 50,
+        expect = temp_ok,
     )
-    dc = 100
+    dc = FAN_MAX
+    temp_ok_times = 0
+    temp_high_times = 0
     while True:
-        temp = (float(cpu_temperature())+float(gpu_temperature()))/2.0
-        dc += pid.run(temp, mode="PD")
-        dc = min(FAN_MAX, max(FAN_MIN, dc))
+        try:
+            temp = (float(cpu_temperature())+float(gpu_temperature()))/2.0
+        except OSError as err:
+            logger.error("Error reading temperature: %s", err)
+            # Consider temperature as high if reading fails
+            temp = temp_ok + 10
+
+        # Increase counters depending on temperature
+        if temp < temp_ok:
+            temp_ok_times += 1
+            temp_high_times = 0
+        else:
+            temp_ok_times = 0
+            temp_high_times += 1
+
+        # Turn off fan if temperature is lower than temp_ok for `temp_ok_times` times
+        if temp_times_counter_max < temp_ok_times:
+            dc = 0
+        # Turn on fan if temperature is higher than temp_ok for `temp_high_times` times
+        elif temp_times_counter_max < temp_high_times:
+            dc += pid.run(temp, mode="PD")
+            dc = min(FAN_MAX, max(FAN_MIN, dc))
         fan_power = dc
         logging.debug("Temp: %s, DC: %s", temp, dc)
         fan_pwm_pin.ChangeDutyCycle(dc)
         led_pwm_pin.ChangeDutyCycle(dc)
-        time.sleep(1)
+        time.sleep(5)
 
 # if __name__ == '__main__':
 #     logging.debug("Portale Hard Disk Info: %s", portable_hard_disk_info())
