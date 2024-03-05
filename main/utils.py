@@ -151,7 +151,7 @@ def temperature_read():
 
 def top_process(n: int)->list:
     """
-    Get top 3 process with highest CPU usage
+    Get top N processes with highest CPU usage
 
     Return example:
     [
@@ -159,8 +159,13 @@ def top_process(n: int)->list:
         ['systemd', '0.1', '10.5']
     ]
     """
-    top = os.popen("ps -eo comm,%cpu,rss --sort=-%cpu | awk 'NR==1 {print $1, $2, \"RSS(MB)\"} NR>1 {printf \"%s %s %.1f\\n\", $1, $2, $3/1024}' | head -n "+str(n+1)).read()
-    # extract service name, CPU%, MEM% to list
+    command = (
+        "ps -eo comm,%cpu,rss --sort=-%cpu | "
+        "grep -v '^ps ' | "  # Exclude 'ps'
+        "awk 'NR==1 {print $1, $2, \"RSS(MB)\"} NR>1 {printf \"%s %s %.1f\\n\", $1, $2, $3/1024}' | "
+        "head -n " + str(n+1)
+    )
+    top = os.popen(command).read()    # extract service name, CPU%, MEM% to list
     result = top.split('\n')[1:-1]
     result = list(map(lambda x: x.split(), result))
     return result
