@@ -285,7 +285,7 @@ def Menu_Page():
         epd.displayPartial(epd.getbuffer(menu_image))
 
         if ok_button_press_val == -1:
-            eval("item_%s.item_main()", menu_button_val)
+            eval("item_%s.item_main()" % menu_button_val)
 
             choice_button_flag = -1
             # his_button_val = -3
