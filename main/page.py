@@ -88,7 +88,7 @@ class Page():
             self.refresh_num += 1
             self.clear_count += 1
             if self.refresh_num == 5 and self.mode == 0:
-                
+
                 self.draw.ellipse((2,2,19,19),fill = 255-self.background_color)
                 self.draw.text((6, 1), 'S', font = font(16), fill = self.background_color)
                 self.update()
@@ -97,22 +97,33 @@ class Page():
                 time.sleep(0.5)
         if self.mode == 1:
             self.change_val(1)
- 
+
     def page_1_setup(self):
-        pass
+        self.draw.text((80, 0), "BASIC INFO", font = font(18), fill = 255 - self.background_color)
+        self.draw.line([(0,22),(250,22)], fill = 255 - self.background_color,width = 2)
 
     def page_1_update(self):
         """BASIC INFO"""
-        pi_msg = pi_read()
-        # fan_control(int((float(cpu_temperature())+float(gpu_temperature()))/2.0))
-        
-        self.draw.text((80, 0), "BASIC INFO", font = font(18), fill = 255 - self.background_color)
-        self.draw.line([(0,22),(250,22)], fill = 255 - self.background_color,width = 2)
-        
-        self.draw.rectangle((0, 24, int(12.5*len(str(getIP()))), 47), fill = 255-self.background_color)
-        self.draw.text((0, 26), 'IP: ' + str(getIP()), font = font(16), fill = self.background_color)       
-        
         self.draw.rectangle((37, 53, 105, 73), fill = self.background_color)
+
+        ip_info = getIP()
+        if not ip_info:
+            ip_info_str = "Unknown"
+            fill_len = int(14.5*len(ip_info_str))
+        else:
+            ip_info_str = str(ip_info)
+            fill_len = int(12.5*len(ip_info_str))
+
+        self.draw.rectangle((0, 24, fill_len, 47), fill = 255-self.background_color)
+        self.draw.text((0, 26), 'IP: ' + ip_info_str, font = font(16), fill = self.background_color)
+
+        try:
+            pi_msg = pi_read()
+        except Exception as e:
+            logger.error("Failed to get info: %s", e)
+            self.draw.text((0, 26), 'Error: Failed to get info', font = font(14), fill = 255-self.background_color)
+            return
+
         self.draw.text((0, 53), 'CPU: ' + pi_msg['cpu_usage'] + '%', font = font(16), fill = 255-self.background_color)
         self.draw.rectangle((0, 75, 234, 85), outline = 255-self.background_color)
         self.draw.rectangle((0, 75, 234 * float(pi_msg['cpu_usage'])/100, 85), fill = 255-self.background_color)
@@ -124,7 +135,6 @@ class Page():
         self.draw.text((120, 88), 'total: ' + str(pi_msg['ram'][0]) + 'M', font = font(16), fill = 255-self.background_color)
         self.draw.rectangle((0, 110, 234, 120), outline = 255-self.background_color)
         self.draw.rectangle((0, 110, 234 * ram_usage/100, 120), fill = 255-self.background_color) 
-    
 
     def page_2_setup(self):
         self.draw.text((65, 0), "STATUS", font = font(18), fill = 255-self.background_color)
@@ -135,10 +145,16 @@ class Page():
         
     def page_2_update(self):
         """STATUS"""
-        pi_msg = temperature_read()
-        # fan_control(int((float(cpu_temperature())+float(gpu_temperature()))/2.0))
-        # self.draw.rectangle((0, 80, 250, 100), fill = self.background_color)
+        try:
+            pi_msg = temperature_read()
+            temp_cpu_text = pi_msg['cpu_temperature'] + 'C'
+            temp_gpu_text = pi_msg['gpu_temperature'] + 'C'
+        except Exception as e:
+            logger.error("Failed to get temperature: %s", e)
+            temp_cpu_text = "N/A"
+            temp_gpu_text = "N/A"
 
+        # Temp CPU icon
         self.draw.arc((8,73,16,81),180,360, fill = 255-self.background_color)
         self.draw.line([(8,77),(8,93)], fill = 255-self.background_color,width = 1)
         self.draw.line([(16,77),(16,93)], fill = 255-self.background_color,width = 1)
@@ -147,6 +163,7 @@ class Page():
         self.draw.ellipse((8,97,16,105),fill = 255-self.background_color)
         self.draw.line([(12.5,81),(12.5,100)], fill = 255-self.background_color,width = 1) 
 
+        # Temp GPU icon
         self.draw.arc((95,73,103,81),180,360, fill = 255-self.background_color)
         self.draw.line([(95,77),(95,93)], fill = 255-self.background_color,width = 1)
         self.draw.line([(103,77),(103,93)], fill = 255-self.background_color,width = 1)
@@ -155,24 +172,30 @@ class Page():
         self.draw.ellipse((95,97,103,105),fill = 255-self.background_color)
         self.draw.line([(99,81),(99,100)], fill = 255-self.background_color,width = 1)
 
-        self.draw.ellipse((170,74,202,106),fill = 255-self.background_color)#fan
+        # Temp text
+        self.draw.rectangle((23, 75, 65, 96), fill = self.background_color)
+        self.draw.rectangle((110, 75, 150, 100), fill = self.background_color)
+
+        self.draw.text((24, 75), temp_cpu_text, font = font(15), fill = 255-self.background_color)
+        self.draw.text((111, 75), temp_gpu_text, font = font(15), fill = 255-self.background_color)
+
+        # Fan icon with animation
+        self.draw.ellipse((170,74,202,106),fill = 255-self.background_color)
         self.draw.pieslice((174,78,198,102),0+self.refresh_num*60,60+self.refresh_num*60, fill = self.background_color)
         self.draw.pieslice((174,78,198,102),120+self.refresh_num*60,180+self.refresh_num*60, fill = self.background_color)
         self.draw.pieslice((174,78,198,102),240+self.refresh_num*60,300+self.refresh_num*60, fill = self.background_color)
         self.draw.ellipse((182,86,190,94),fill = 255-self.background_color)
         self.draw.ellipse((184,88,188,92),fill = self.background_color)
-        
-        self.draw.rectangle((23, 75, 65, 96), fill = self.background_color)
-        self.draw.rectangle((110, 75, 150, 100), fill = self.background_color)
-        self.draw.rectangle((206, 75, 250, 100), fill = self.background_color)
 
-        self.draw.text((24, 75), pi_msg['cpu_temperature'] + 'C', font = font(15), fill = 255-self.background_color)
-        self.draw.text((111, 75), pi_msg['gpu_temperature'] + 'C', font = font(15), fill = 255-self.background_color)
+        # Fan text
+        self.draw.rectangle((206, 75, 250, 100), fill = self.background_color)
         self.draw.text((207, 75), str(fan_power_read()) + '%', font = font(15), fill = 255-self.background_color)
 
+
     def page_3_setup(self):
-        pass
-        # self.draw.text((80, 0), "DISK INFO", font = font(20), fill = 255-self.background_color)
+        self.draw.rectangle((0, 26, 250, 250), fill = self.background_color)
+        self.draw.text((80, 0), "DISK INFO", font = font(18), fill = 255-self.background_color)
+        self.draw.line([(0,25),(250,25)], fill = 255-self.background_color,width = 2)
     
     def page_3_update(self):
         """DISK INFO"""
@@ -187,18 +210,21 @@ class Page():
             elif a > 1:
                 a = "%.3gK" % a
             return a
-        hard_disk_list = [] 
-        hard_disk_list = portable_hard_disk_info() 
-        d_space = disk_space()
-        # fan_control(int((float(cpu_temperature())+float(gpu_temperature()))/2.0))  
         
-        self.draw.rectangle((0, 26, 250, 250), fill = self.background_color)
-        self.draw.text((80, 0), "DISK INFO", font = font(18), fill = 255-self.background_color)
-        self.draw.line([(0,25),(250,25)], fill = 255-self.background_color,width = 2)
+        d_space = disk_space()
         self.draw.text((6, 26), 'root: ' + d_space[3], font = font(14), fill = 255-self.background_color)
         self.draw.text((102, 26), 'Size: %s / %s' % (d_space[1],d_space[0]), font = font(14), fill = 255-self.background_color)
         self.draw.rectangle((2, 43, 234, 53), outline = 255-self.background_color)
         self.draw.rectangle((3, 43, 234 * float(d_space[3].replace('%', ''))/100, 53), fill = 255-self.background_color)
+
+        hard_disk_list = []
+        try:
+            hard_disk_list = portable_hard_disk_info()
+        except Exception as e:
+            logger.error("Failed to get disk info: %s", e)
+            self.draw.text((6, 26), 'Error: Failed to get disk info', font = font(14), fill = 255-self.background_color)
+            return
+        
         if len(hard_disk_list) != 0 and len(hard_disk_list) < 3:
             for i in range(len(hard_disk_list)):
                 self.draw.text((6, 55 + i*29), hard_disk_list[i][0][-4:].upper() +': ' + hard_disk_list[i][4], font = font(14), fill = 255-self.background_color)
@@ -213,22 +239,26 @@ class Page():
 
 
     def page_4_setup(self):
-        pass
-    
-    def page_4_update(self):
-        """TOP 5 PROCESSES"""
-        top = top_process(5)
-        self.draw.rectangle((0, 26, 250, 250), fill = self.background_color)
         self.draw.text((60, 0), "TOP 5 PROCESSES", font = font(18), fill = 255-self.background_color)
         self.draw.line([(0,25),(250,25)], fill = 255-self.background_color,width = 2)
-
+        
+    def page_4_update(self):
+        """TOP 5 PROCESSES"""
+        self.draw.rectangle((0, 26, 250, 250), fill = self.background_color)
+        try:
+            top = top_process(5)
+        except Exception as e:
+            logger.error("Failed to get top processes: %s", e)
+            self.draw.text((6, 26), 'Error: Failed to get top processes', font = font(14), fill = 255-self.background_color)
+            return
+        
         self.draw.text((6, 26), "Name", font = font(14), fill = 255-self.background_color)
         self.draw.text((150, 26), "CPU", font = font(14), fill = 255-self.background_color)
         self.draw.text((190, 26), "MEM(MB)", font = font(14), fill = 255-self.background_color)
-        for i in range(5):
+        for i in range(len(top)):
             self.draw.text((6, 40 + 14 * i), top[i][0][:17], font = font(14), fill = 255-self.background_color)
             self.draw.text((150, 40 + 14 * i), top[i][1], font = font(14), fill = 255-self.background_color)
-            self.draw.text((190, 40 + 14 * i), top[i][2], font = font(14), fill = 255-self.background_color)            
+            self.draw.text((190, 40 + 14 * i), top[i][2], font = font(14), fill = 255-self.background_color)
 
 
     def shutdown_Animation(self):
