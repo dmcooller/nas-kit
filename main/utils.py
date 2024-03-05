@@ -191,7 +191,7 @@ def fan_power_read():
 
 
 
-def getIP(ifaces=['wlan0', 'eth0']):
+def getIP(ifaces=['wlan0', 'eth0', 'end0']):
     import re
     if isinstance(ifaces, str):
         ifaces = [ifaces]
