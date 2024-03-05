@@ -23,7 +23,7 @@ GPIO.setup(output_list, GPIO.OUT)
 fan_pwm_pin = GPIO.PWM(FAN_PWM, fan_pwm_freq)
 led_pwm_pin = GPIO.PWM(LED_PWM, led_pwm_freq)
 fan_pwm_pin.start(0)
-led_pwm_pin.start(50)
+led_pwm_pin.start(0) # Turn off LED
 
 
 class PID():
@@ -207,6 +207,7 @@ def getIP(ifaces=['wlan0', 'eth0', 'end0']):
 
 def pid_control():
     global fan_power
+
     temp_ok = 50
     # Turn on/off fan if temperature is lower/higher for `n` times counter
     temp_times_counter_max = 5
@@ -246,7 +247,7 @@ def pid_control():
         fan_power = dc
         logging.debug("Temp: %s, DC: %s", temp, dc)
         fan_pwm_pin.ChangeDutyCycle(dc)
-        led_pwm_pin.ChangeDutyCycle(dc)
+        #led_pwm_pin.ChangeDutyCycle(dc) # Turn off LED
         time.sleep(5)
 
 # if __name__ == '__main__':
