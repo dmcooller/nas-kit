@@ -26,6 +26,11 @@ git clone --depth=1 https://github.com/dmcooller/nas-kit.git
 cd nas-kit
 python3 setup.py
 ```
+
+## Configuration
+
+Optionally change `settings.ini` file to configure some application settings.
+
 ## Manual control
 
 You can manually start/storp/restart the service with the following commands.
