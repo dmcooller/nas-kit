@@ -11,11 +11,15 @@ from concurrent.futures import ThreadPoolExecutor
 logging.basicConfig(level=logging.WARNING)
 
 #run_command("sudo resize2fs /dev/mmcblk0p2")
-#Menu_page_protect 
+#Menu_page_protect
 # Menu_page_protect_flag = 0
 
 #background_color
 background_color_config = 255
+
+# Threshold for the screen inactivity in seconds
+screen_inactivity_threshold = 300  # 5 minutes
+is_sleep = False
 
 #page_mode and flag
 page_mode_val = 0
@@ -298,21 +302,35 @@ def Menu_Page():
 
 ###Main Service
 def main():
-    global current_page,last_page,button_press_protect,background_color_config,page_mode_val
+    global current_page,last_page,button_press_protect,background_color_config,page_mode_val,is_sleep
 
+    last_interaction_time = time.time() # Initialize last interaction time
     while True:
+        # Check for inactivity
+        if (not is_sleep) and (time.time() - last_interaction_time > screen_inactivity_threshold):
+            page.screen_sleep()
+            is_sleep = True
+
         page.background_color = background_color_config
         if current_page != last_page:
             logging.debug("main_page")
+            if is_sleep:
+                page.screen_wake()
+                is_sleep = False
             button_press_protect = 1
             last_page = current_page
             page.mode = page_mode_val
             page(current_page)
+            last_interaction_time = time.time() # Reset inactivity timer
         elif back_button_press_val >= 2:
             logging.debug("menu_page")
+            if is_sleep:
+                page.screen_wake()
+                is_sleep = False
             Menu_Page()
             current_page = 1
             last_page = -3
+            last_interaction_time = time.time() # Reset inactivity timer
             logging.debug("quit_menu")
 
         button_press_protect = 0

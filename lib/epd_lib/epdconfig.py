@@ -70,15 +70,17 @@ class RaspberryPi:
         self.GPIO.setup(self.BUSY_PIN, self.GPIO.IN)
         self.SPI.max_speed_hz = 4000000
         self.SPI.mode = 0b00
+        logging.debug("EPD Module Init")
         return 0
 
     def module_exit(self):
-        # logging.debug("spi end")
+        logging.debug("EPD Module Exit")
+        # logging.info("spi end")
         # self.SPI.close()
 
-        # logging.debug("close 5V, Module enters 0 power consumption ...")
+        # logging.info("close 5V, Module enters 0 power consumption ...")
         self.GPIO.output(self.RST_PIN, 0)
-        # self.GPIO.output(self.DC_PIN, 0)
+        self.GPIO.output(self.DC_PIN, 0)
 
         # self.GPIO.cleanup()
 

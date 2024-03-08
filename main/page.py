@@ -289,6 +289,13 @@ class Page():
         epd.display(epd.getbuffer(self.image))
         epd.sleep()
 
+    def screen_sleep(self):
+        epd.sleep()
+        logger.info("Screen is in sleep mode")
+
+    def screen_wake(self):
+        epd.init(epd.PART_UPDATE)
+        logger.info("Screen is awake")
 
 
     def change_val(self, x = 0):
