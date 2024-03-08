@@ -12,6 +12,7 @@ class AppSettings:
         self.fan_max: int = 100
         self.temp_ok: int = 50
         self.screen_time_out: int = 60 # in seconds
+        self.start_page: int = 1
         self._load_and_validate()
 
     def _load_and_validate(self):
@@ -22,6 +23,7 @@ class AppSettings:
         self.fan_max = config.getint('Settings', 'fan_max', fallback=self.fan_max)
         self.temp_ok = config.getint('Settings', 'temp_ok', fallback=self.temp_ok)
         self.screen_time_out = config.getint('Settings', 'screen_time_out', fallback=self.screen_time_out)
+        self.start_page = config.getint('Settings', 'start_page', fallback=self.start_page)
 
         # Validate FAN_MIN and FAN_MAX
         if not (0 <= self.fan_min <= 100):
@@ -34,6 +36,10 @@ class AppSettings:
             self.fan_min = 25
             self.fan_max = 100
             logger.warning("FAN_MIN cannot be higher than FAN_MAX. Using default values.")
+        # Validate START_PAGE
+        if self.start_page not in [1, 2, 3, 4]:
+            self.start_page = 1
+            logger.warning("Start page must be 1, 2, 3 or 4. Using default value.")
 
     def _param_exists(self, param: str) -> bool:
         config = configparser.ConfigParser()
@@ -51,7 +57,7 @@ class AppSettings:
             config.write(configfile)
 
     def __str__(self):
-        return f"Settings(fan_min={self.fan_min}, fan_max={self.fan_max}, temp_ok={self.temp_ok}, screen_time_out={self.screen_time_out})"
+        return f"Settings(fan_min={self.fan_min}, fan_max={self.fan_max}, temp_ok={self.temp_ok}, screen_time_out={self.screen_time_out}, start_page={self.start_page})"
 
 try:
     settings = AppSettings('settings.ini')

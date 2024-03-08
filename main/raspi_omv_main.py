@@ -30,7 +30,7 @@ page_mode_val = 0
 page_quantity = 4
 
 #button_val
-current_page = 1
+current_page = settings.start_page
 last_page = -1
 back_button_press_val = 0
 button_press_protect = 0
