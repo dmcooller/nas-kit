@@ -1,10 +1,10 @@
-import RPi.GPIO as GPIO
 import sys
 import os
 import logging
-import time 
-from PIL import Image,ImageDraw,ImageFont 
-import traceback
+import time
+
+from PIL import Image,ImageDraw,ImageFont
+
 from utils import *
 
 logger = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ class Page():
                 self.draw.text((6, 1), 'S', font = font(16), fill = self.background_color)
                 self.update()
                 break
-            while self.page_change_flag and time.time()-t < self.timer: 
+            while self.page_change_flag and time.time()-t < self.timer:
                 time.sleep(0.5)
         if self.mode == 1:
             self.change_val(1)

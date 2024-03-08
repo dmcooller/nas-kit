@@ -4,6 +4,9 @@ import os
 import RPi.GPIO as GPIO
 import time
 
+from settings import settings
+
+
 logger = logging.getLogger(__name__)
 
 FAN_PWM = 18
@@ -11,8 +14,8 @@ LED_PWM = 26
 fan_pwm_freq = 100
 led_pwm_freq = 1
 
-FAN_MAX = 100
-FAN_MIN = 20
+FAN_MAX = settings.fan_max
+FAN_MIN = settings.fan_min
 fan_power = 0
 
 GPIO.setwarnings(False)
@@ -208,7 +211,7 @@ def getIP(ifaces=['wlan0', 'eth0', 'end0']):
 def pid_control():
     global fan_power
 
-    temp_ok = 50
+    temp_ok = settings.temp_ok
     # Turn on/off fan if temperature is lower/higher for `n` times counter
     temp_times_counter_max = 5
 

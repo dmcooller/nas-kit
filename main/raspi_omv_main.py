@@ -1,14 +1,18 @@
 #!/usr/bin/ python3
 # -*- coding:utf-8 -*-
-import RPi.GPIO as GPIO
 import logging
+logging.basicConfig(level=logging.WARNING)
+
 import time
-from PIL import Image,ImageDraw
-from utils import *
-from page import *
 from concurrent.futures import ThreadPoolExecutor
 
-logging.basicConfig(level=logging.WARNING)
+import RPi.GPIO as GPIO
+from PIL import Image,ImageDraw
+
+from utils import run_command, pid_control
+from page import Page, epd, font
+from settings import settings
+
 
 #run_command("sudo resize2fs /dev/mmcblk0p2")
 #Menu_page_protect
@@ -18,7 +22,7 @@ logging.basicConfig(level=logging.WARNING)
 background_color_config = 255
 
 # Threshold for the screen inactivity in seconds
-screen_inactivity_threshold = 300  # 5 minutes
+screen_inactivity_threshold = settings.screen_time_out
 is_sleep = False
 
 #page_mode and flag
@@ -261,7 +265,7 @@ def Menu_Page():
     menu_button_val,Menu_item_len,Menu_item_dict,background_color_config
 
     epd.init(epd.FULL_UPDATE)
-    epd.displayPartBaseImage(epd.getbuffer(menu_image)) 
+    epd.displayPartBaseImage(epd.getbuffer(menu_image))
     epd.init(epd.PART_UPDATE)
 
     menu_button_val = 1
@@ -307,7 +311,7 @@ def main():
     last_interaction_time = time.time() # Initialize last interaction time
     while True:
         # Check for inactivity
-        if (not is_sleep) and (time.time() - last_interaction_time > screen_inactivity_threshold):
+        if (not is_sleep) and (0 < screen_inactivity_threshold < time.time() - last_interaction_time):
             page.screen_sleep()
             is_sleep = True
 
@@ -338,7 +342,6 @@ def main():
         
 ###main_thread
 def main_thread():
-    # Using ThreadPoolExecutor to manage threads
     with ThreadPoolExecutor(max_workers=2) as executor:
         executor.submit(main)
         executor.submit(pid_control)
