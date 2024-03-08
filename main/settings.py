@@ -49,7 +49,7 @@ class AppSettings:
     def save_param(self, param: str, value):
         if not self._param_exists(param):
             raise ValueError(f"Parameter {param} does not exist in settings file.")
-        
+
         config = configparser.ConfigParser()
         config.read(self.file_path)
         config['Settings'][param] = str(value)
@@ -60,7 +60,7 @@ class AppSettings:
         return f"Settings(fan_min={self.fan_min}, fan_max={self.fan_max}, temp_ok={self.temp_ok}, screen_time_out={self.screen_time_out}, start_page={self.start_page})"
 
 try:
-    settings = AppSettings('settings.ini')
+    settings = AppSettings('./settings.ini')
     logger.info("Settings loaded: %s", settings)
 except Exception as e:
     logger.error("Error loading settings: %s", e)

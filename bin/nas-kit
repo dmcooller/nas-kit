@@ -3,7 +3,8 @@
 case "$1" in
     start)
         echo "Starting NAS Kit"
-        sudo {base_path}/venv/bin/python3 {base_path}/main/raspi_omv_main.py &
+        cd {base_path}
+        sudo ./venv/bin/python3 ./main/raspi_omv_main.py &
         ;;
     stop)
         echo "Stopping NAS Kit"
